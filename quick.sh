@@ -52,6 +52,8 @@ HEATINGCURVE=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?
 
 CALCULATEDSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'Beregnet temperatur'|awk -F'[ <]' '{print $7}')
 
+HOTWATERSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=22' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user11'|awk -F' ' '{print $4}')
 
 echo dvienergi.smartcontrol.heating_curve value=${HEATINGCURVE}
 echo dvienergi.smartcontrol.calculated_setpoint value=${CALCULATEDSETPOINT}
+echo dvienergi.smartcontrol.hotwater_setpoint value=${HOTWATERSETPOINT}
