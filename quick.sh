@@ -46,3 +46,12 @@ while read LINE; do
 
   esac
 done < <(curl 'https://smartcontrol.dvienergi.com/includes/process.php' -H "cookie: PHPSESSID=${COOKIE}" --data 'subupdatepumpgraphics=1' -s|sed 's/></>\n</g'|grep "temp value")
+
+
+HEATINGCURVE=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user2'|awk -F' ' '{print $4}')
+
+CALCULATEDSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'Beregnet temperatur'|awk -F'[ <]' '{print $7}')
+
+
+echo dvienergi.smartcontrol.heating_curve value=${HEATINGCURVE}
+echo dvienergi.smartcontrol.calculated_setpoint value=${CALCULATEDSETPOINT}
