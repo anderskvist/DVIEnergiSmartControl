@@ -39,6 +39,9 @@ while read LINE; do
     value11)
       echo dvienergi.smartcontrol.compressor_back value=${V}
       ;;
+    value9)
+      echo dvienergi.smartcontrol.solar_roof value=${V}
+      ;;
     *)
       echo ${LINE} 1>&2
       echo ${K}: ${V} 1>&2
