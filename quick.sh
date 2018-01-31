@@ -10,34 +10,34 @@ while read LINE; do
 
   case "${K}" in
     value7)
-      echo dvienergi.smartcontrol.outside value=${V}0
+      echo dvienergi.smartcontrol.outside value=${V}
       ;;
     value5)
-      echo dvienergi.smartcontrol.heating value=${V}0
+      echo dvienergi.smartcontrol.heating value=${V}
       ;;
     value3)
-      echo dvienergi.smartcontrol.hotwater value=${V}0
+      echo dvienergi.smartcontrol.hotwater value=${V}
       ;;
     value1)
-      echo dvienergi.smartcontrol.heating_forward value=${V}0
+      echo dvienergi.smartcontrol.heating_forward value=${V}
       ;;
     value2)
-      echo dvienergi.smartcontrol.heating_return1 value=${V}0
+      echo dvienergi.smartcontrol.heating_return1 value=${V}
       ;;
     value8)
-      echo dvienergi.smartcontrol.heating_return2 value=${V}0
+      echo dvienergi.smartcontrol.heating_return2 value=${V}
       ;;
     value13)
-      echo dvienergi.smartcontrol.ground_return value=${V}0
+      echo dvienergi.smartcontrol.ground_return value=${V}
       ;;
     value14)
-      echo dvienergi.smartcontrol.ground_forward value=${V}0
+      echo dvienergi.smartcontrol.ground_forward value=${V}
       ;;
     value12)
-      echo dvienergi.smartcontrol.compressor_front value=${V}0
+      echo dvienergi.smartcontrol.compressor_front value=${V}
       ;;
     value11)
-      echo dvienergi.smartcontrol.compressor_back value=${V}0
+      echo dvienergi.smartcontrol.compressor_back value=${V}
       ;;
     *)
       echo ${LINE} 1>&2
