@@ -54,6 +54,16 @@ CALCULATEDSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoic
 
 HOTWATERSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=22' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user11'|awk -F' ' '{print $4}')
 
+COMPRESSORTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Kompressor" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
+
+HOTWATERTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Kompressor" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
+
+ELECTRICHEATERTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Kompressor" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
+
 echo dvienergi.smartcontrol.heating_curve value=${HEATINGCURVE}
 echo dvienergi.smartcontrol.calculated_setpoint value=${CALCULATEDSETPOINT}
 echo dvienergi.smartcontrol.hotwater_setpoint value=${HOTWATERSETPOINT}
+
+echo dvienergi.smartcontrol.compressor_time value=${COMPRESSORTIME}
+echo dvienergi.smartcontrol.hotwater_time value=${HOTWATERTIME}
+echo dvienergi.smartcontrol.electricheater_time value=${ELECTRICHEATERTIME}
