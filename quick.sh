@@ -70,7 +70,7 @@ while read LINE; do
 	  A3-1.gif)
 	      # not a pump
 	      ;;
-	  A4-1-4.gif)
+	  A4-1.gif)
 	      echo dvienergi.smartcontrol.ground_pump value=false
 	      ;;
 	  A4-1-4.gif)
