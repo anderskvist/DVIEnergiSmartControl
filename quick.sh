@@ -115,11 +115,20 @@ while read LINE; do
 done < <(curl 'https://smartcontrol.dvienergi.com/includes/process.php' -H "cookie: PHPSESSID=${COOKIE}" --data 'subupdatepumpgraphics=1' -s|sed 's/></>\n</g'|grep "\(temp value\|img src\)")
 
 
-HEATINGCURVE=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user2'|awk -F' ' '{print $4}')
-
-CALCULATEDSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'Beregnet temperatur'|awk -F'[ <]' '{print $7}')
+while read LINE; do
+    case "${LINE}" in
+	*user2*)
+	    echo ${LINE}|awk -F' ' '{print "dvienergi.smartcontrol.heating_curve value=" $4}'
+	    ;;
+	*Beregnet\ temperatur*)
+	    echo ${LINE}|awk -F'[ <]' '{print "dvienergi.smartcontrol.calculated_setpoint value=" $6}'
+	    ;;
+    esac
+done < <(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g')
 
 HOTWATERSETPOINT=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=22' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user11'|awk -F' ' '{print $4}')
+
+
 
 COMPRESSORTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Kompressor" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
 HOTWATERTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Varmt vand" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
@@ -127,8 +136,6 @@ ELECTRICHEATERTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.
 SOLARTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Solvarme" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
 SOLARTOGROUNDTIME=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpinfo.php?id=31' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep "Sol til Jord" -A 1|tail -n 1|sed -e 's/<[^>]*>//g')
 
-echo dvienergi.smartcontrol.heating_curve value=${HEATINGCURVE}
-echo dvienergi.smartcontrol.calculated_setpoint value=${CALCULATEDSETPOINT}
 echo dvienergi.smartcontrol.hotwater_setpoint value=${HOTWATERSETPOINT}
 
 echo dvienergi.smartcontrol.compressor_time value=${COMPRESSORTIME}
