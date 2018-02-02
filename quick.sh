@@ -53,16 +53,16 @@ while read LINE; do
   if [ -n "${P}" ]; then
       case "${P}" in
 	  A1-1.gif)
-	      echo dvienergi.smartcontrol.solar_heating_pump value=false
-	      echo dvienergi.smartcontrol.solar_to_ground value=false
+	      echo dvienergi.smartcontrol.solar_heating_pump value=0i
+	      echo dvienergi.smartcontrol.solar_to_ground value=0i
 	      ;;
 	  A1-1-4.gif)
-	      echo dvienergi.smartcontrol.solar_heating_pump value=true
-	      echo dvienergi.smartcontrol.solar_to_ground value=false
+	      echo dvienergi.smartcontrol.solar_heating_pump value=1i
+	      echo dvienergi.smartcontrol.solar_to_ground value=0i
 	      ;;
 	  A1-2-4.gif)
-	      echo dvienergi.smartcontrol.solar_heating_pump value=true
-	      echo dvienergi.smartcontrol.solar_to_ground value=true
+	      echo dvienergi.smartcontrol.solar_heating_pump value=1i
+	      echo dvienergi.smartcontrol.solar_to_ground value=1i
 	      ;;
 	  A2-1.gif)
 	      # not a pump
@@ -71,40 +71,40 @@ while read LINE; do
 	      # not a pump
 	      ;;
 	  A4-1.gif)
-	      echo dvienergi.smartcontrol.ground_pump value=false
+	      echo dvienergi.smartcontrol.ground_pump value=0i
 	      ;;
 	  A4-1-4.gif)
-	      echo dvienergi.smartcontrol.ground_pump value=true
+	      echo dvienergi.smartcontrol.ground_pump value=1i
 	      ;;
 	  A4-6-4.gif)
-	      echo dvienergi.smartcontrol.ground_pump value=true
+	      echo dvienergi.smartcontrol.ground_pump value=1i
 	      ;;
 	  A5-1.gif)
-	      echo dvienergi.smartcontrol.compressor value=false
+	      echo dvienergi.smartcontrol.compressor value=0i
 	      ;;
 	  A5-1-4.gif)
-	      echo dvienergi.smartcontrol.compressor value=true
+	      echo dvienergi.smartcontrol.compressor value=1i
 	  ;;
 	  A6-0.gif)
-	      echo dvienergi.smartcontrol.electric_heater value=false
+	      echo dvienergi.smartcontrol.electric_heater value=0i
 	      ;;
 	  A6-1.gif)
-	      echo dvienergi.smartcontrol.electric_heater value=false
+	      echo dvienergi.smartcontrol.electric_heater value=0i
 	      ;;
 	  A6-1-4.gif)
-	      echo dvienergi.smartcontrol.electric_heater value=true
+	      echo dvienergi.smartcontrol.electric_heater value=1i
 	      ;;
 	  A7-1.gif)
-	      echo dvienergi.smartcontrol.house_heating value=false
+	      echo dvienergi.smartcontrol.house_heating value=0i
 	      ;;
 	  A7-1-4.gif)
-	      echo dvienergi.smartcontrol.house_heating value=true
+	      echo dvienergi.smartcontrol.house_heating value=1i
 	      ;;
 	  A8-1.gif)
-	      echo dvienergi.smartcontrol.house_heating_pump value=false
+	      echo dvienergi.smartcontrol.house_heating_pump value=0i
 	      ;;
 	  A8-1-4.gif)
-	      echo dvienergi.smartcontrol.house_heating_pump value=true
+	      echo dvienergi.smartcontrol.house_heating_pump value=1i
 	      ;;
 
 	  *)
