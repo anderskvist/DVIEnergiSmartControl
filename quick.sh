@@ -4,51 +4,115 @@ COOKIE=${1}
 
 while read LINE; do
 
-  K=$(echo ${LINE}|awk -F'[ "]' '{print $4}')
-  V=$(echo ${LINE}|awk -F'[>&]' '{print $2}')
+  K=$(echo ${LINE}|grep "temp value"|awk -F'[ "]' '{print $4}')
+  V=$(echo ${LINE}|grep "temp value"|awk -F'[>&]' '{print $2}')
+  P=$(echo ${LINE}|grep "img src" | awk -F '"' '{print $2}' | basename $(cat /dev/stdin) 2> /dev/null)
 
 
-  case "${K}" in
-    value7)
-      echo dvienergi.smartcontrol.outside value=${V}
-      ;;
-    value5)
-      echo dvienergi.smartcontrol.heating value=${V}
-      ;;
-    value3)
-      echo dvienergi.smartcontrol.hotwater value=${V}
-      ;;
-    value1)
-      echo dvienergi.smartcontrol.heating_forward value=${V}
-      ;;
-    value2)
-      echo dvienergi.smartcontrol.heating_return1 value=${V}
-      ;;
-    value8)
-      echo dvienergi.smartcontrol.heating_return2 value=${V}
-      ;;
-    value13)
-      echo dvienergi.smartcontrol.ground_return value=${V}
-      ;;
-    value14)
-      echo dvienergi.smartcontrol.ground_forward value=${V}
-      ;;
-    value12)
-      echo dvienergi.smartcontrol.compressor_front value=${V}
-      ;;
-    value11)
-      echo dvienergi.smartcontrol.compressor_back value=${V}
-      ;;
-    value9)
-      echo dvienergi.smartcontrol.solar_roof value=${V}
-      ;;
-    *)
-      echo ${LINE} 1>&2
-      echo ${K}: ${V} 1>&2
-      ;;
+  if [ -n "${K}" ]; then
+      case "${K}" in
+	  value7)
+	      echo dvienergi.smartcontrol.outside value=${V}
+	      ;;
+	  value5)
+	      echo dvienergi.smartcontrol.heating value=${V}
+	      ;;
+	  value3)
+	      echo dvienergi.smartcontrol.hotwater value=${V}
+	      ;;
+	  value1)
+	      echo dvienergi.smartcontrol.heating_forward value=${V}
+	      ;;
+	  value2)
+	      echo dvienergi.smartcontrol.heating_return1 value=${V}
+	      ;;
+	  value8)
+	      echo dvienergi.smartcontrol.heating_return2 value=${V}
+	      ;;
+	  value13)
+	      echo dvienergi.smartcontrol.ground_return value=${V}
+	      ;;
+	  value14)
+	      echo dvienergi.smartcontrol.ground_forward value=${V}
+	      ;;
+	  value12)
+	      echo dvienergi.smartcontrol.compressor_front value=${V}
+	      ;;
+	  value11)
+	      echo dvienergi.smartcontrol.compressor_back value=${V}
+	      ;;
+	  value9)
+	      echo dvienergi.smartcontrol.solar_roof value=${V}
+	      ;;
+	  *)
+	      echo "Unhandled temperature"
+	      echo ${K}: ${V} 1>&2
+	      ;;
+      esac
+  fi
+  if [ -n "${P}" ]; then
+      case "${P}" in
+	  A1-1.gif)
+	      echo dvienergi.smartcontrol.solar_heating_pump value=false
+	      echo dvienergi.smartcontrol.solar_to_ground value=false
+	      ;;
+	  A1-1-4.gif)
+	      echo dvienergi.smartcontrol.solar_heating_pump value=true
+	      echo dvienergi.smartcontrol.solar_to_ground value=false
+	      ;;
+	  A1-2-4.gif)
+	      echo dvienergi.smartcontrol.solar_heating_pump value=true
+	      echo dvienergi.smartcontrol.solar_to_ground value=true
+	      ;;
+	  A2-1.gif)
+	      # not a pump
+	      ;;
+	  A3-1.gif)
+	      # not a pump
+	      ;;
+	  A4-1-4.gif)
+	      echo dvienergi.smartcontrol.ground_pump value=false
+	      ;;
+	  A4-1-4.gif)
+	      echo dvienergi.smartcontrol.ground_pump value=true
+	      ;;
+	  A4-6-4.gif)
+	      echo dvienergi.smartcontrol.ground_pump value=true
+	      ;;
+	  A5-1.gif)
+	      echo dvienergi.smartcontrol.compressor value=false
+	      ;;
+	  A5-1-4.gif)
+	      echo dvienergi.smartcontrol.compressor value=true
+	  ;;
+	  A6-0.gif)
+	      echo dvienergi.smartcontrol.electric_heater value=false
+	      ;;
+	  A6-1.gif)
+	      echo dvienergi.smartcontrol.electric_heater value=false
+	      ;;
+	  A6-1-4.gif)
+	      echo dvienergi.smartcontrol.electric_heater value=true
+	      ;;
+	  A7-1.gif)
+	      echo dvienergi.smartcontrol.house_heating value=false
+	      ;;
+	  A7-1-4.gif)
+	      echo dvienergi.smartcontrol.house_heating value=true
+	      ;;
+	  A8-1.gif)
+	      echo dvienergi.smartcontrol.house_heating_pump value=false
+	      ;;
+	  A8-1-4.gif)
+	      echo dvienergi.smartcontrol.house_heating_pump value=true
+	      ;;
 
-  esac
-done < <(curl 'https://smartcontrol.dvienergi.com/includes/process.php' -H "cookie: PHPSESSID=${COOKIE}" --data 'subupdatepumpgraphics=1' -s|sed 's/></>\n</g'|grep "temp value")
+	  *)
+	      echo "Unhandled pump"
+	      echo ${P} 1>&2
+      esac
+  fi
+done < <(curl 'https://smartcontrol.dvienergi.com/includes/process.php' -H "cookie: PHPSESSID=${COOKIE}" --data 'subupdatepumpgraphics=1' -s|sed 's/></>\n</g'|grep "\(temp value\|img src\)")
 
 
 HEATINGCURVE=$(curl 'https://smartcontrol.dvienergi.com/includes/pumpchoice.php?id=12' -H "cookie: PHPSESSID=${COOKIE}" -s|sed 's/></>\n</g'|grep 'user2'|awk -F' ' '{print $4}')
