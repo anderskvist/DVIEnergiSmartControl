@@ -60,6 +60,7 @@ func main() {
 		fmt.Printf("Could not convert data to json: %s\n", err)
 	} else {
 		if debug {
+			// FIXME: mask password
 			fmt.Println(jsonPrettyPrint(string(json)))
 		}
 	}
@@ -70,6 +71,7 @@ func main() {
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
 		if debug {
+			// FIXME: mask password if present (failed login)
 			fmt.Println(jsonPrettyPrint(string(data)))
 		}
 	}
