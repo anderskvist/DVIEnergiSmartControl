@@ -23,10 +23,9 @@ type DVILogin struct {
 
 // DVIGet is a type for defining what information to request from DVI Energi webservice
 type DVIGet struct {
-	Bestgreen int `json:"bestgreen"`
-	Sensor    int `json:"sensor"`
-	Relay     int `json:"relay"`
-	Timer     int `json:"timer"`
+	Sensor int `json:"sensor"`
+	Relay  int `json:"relay"`
+	Timer  int `json:"timer"`
 }
 
 func jsonPrettyPrint(in string) string {
@@ -50,10 +49,9 @@ func main() {
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
 		Get: DVIGet{
-			Bestgreen: cfg.Section("get").Key("bestgreen").MustInt(0),
-			Sensor:    cfg.Section("get").Key("sensor").MustInt(0),
-			Relay:     cfg.Section("get").Key("relay").MustInt(0),
-			Timer:     cfg.Section("get").Key("timer").MustInt(0)}}
+			Sensor: cfg.Section("get").Key("sensor").MustInt(0),
+			Relay:  cfg.Section("get").Key("relay").MustInt(0),
+			Timer:  cfg.Section("get").Key("timer").MustInt(0)}}
 
 	json, err := json.Marshal(data)
 	if err != nil {
