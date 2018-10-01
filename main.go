@@ -122,7 +122,7 @@ func jsonPrettyPrint(in string) string {
 }
 
 func main() {
-	cfg, err := ini.Load("config.ini")
+	cfg, err := ini.Load(os.Args[1])
 	if err != nil {
 		fmt.Printf("Fail to read file: %v", err)
 		os.Exit(1)
