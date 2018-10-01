@@ -163,9 +163,9 @@ func main() {
 		}
 
 		c, err := client.NewHTTPClient(client.HTTPConfig{
-			Addr:     "",
-			Username: username,
-			Password: password,
+			Addr:     cfg.Section("influxdb").Key("url").String(),
+			Username: cfg.Section("influxdb").Key("username").String(),
+			Password: cfg.Section("influxdb").Key("password").String(),
 		})
 
 		if err != nil {
@@ -175,7 +175,7 @@ func main() {
 
 		// Create a new point batch
 		bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-			Database:  "DVIEnergiSmartControl",
+			Database:  cfg.Section("influxdb").Key("database").String(),
 			Precision: "s",
 		})
 
