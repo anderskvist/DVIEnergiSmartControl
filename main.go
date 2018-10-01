@@ -16,8 +16,6 @@ import (
 	ini "gopkg.in/ini.v1"
 )
 
-var debug = true
-
 // DVILogin is a type for defining the login at DVI Energi webservice
 type DVILogin struct {
 	Usermail     string `json:"usermail"`
@@ -127,6 +125,8 @@ func main() {
 		fmt.Printf("Fail to read file: %v", err)
 		os.Exit(1)
 	}
+
+	debug, _ := cfg.Section("main").Key("debug").Bool()
 
 	data := DVILogin{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
