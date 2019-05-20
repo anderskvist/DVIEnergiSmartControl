@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
-	influx "github.com/anderskvist/DVIEnergiSmartControl/influx"
+	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
+	"github.com/anderskvist/DVIEnergiSmartControl/influx"
 
 	ini "gopkg.in/ini.v1"
 )

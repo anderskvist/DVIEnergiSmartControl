@@ -7,7 +7,7 @@ import (
 
 	client "github.com/influxdata/influxdb/client/v2"
 
-	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
+	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	ini "gopkg.in/ini.v1"
 )
 
