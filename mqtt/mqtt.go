@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+var pubConnection mqtt.Client
+
 func connect(clientId string, uri *url.URL) mqtt.Client {
 	opts := createClientOptions(clientId, uri)
 	client := mqtt.NewClient(opts)
@@ -48,10 +50,33 @@ func SendToMQTT(cfg *ini.File, dviData dvi.DVIResponse) {
 		log.Fatal(err)
 	}
 
-	client := connect("pub", uri)
-	client.Publish("heatpump/Output/Sensor/BrineForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineForward))
-	client.Publish("heatpump/Output/Sensor/BrineReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineReturn))
-	client.Publish("heatpump/Output/Sensor/CentralheatingForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.CentralheatingForward))
-	client.Publish("heatpump/Output/Sensor/CentralheatingReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.CentralheatingReturn))
-	time.Sleep(1 * time.Second)
+	if pubConnection == nil {
+		pubConnection = connect("pub", uri)
+	}
+	pubConnection.Publish("heatpump/Output/Sensor/BrineForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineForward))
+	pubConnection.Publish("heatpump/Output/Sensor/BrineReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineReturn))
+	pubConnection.Publish("heatpump/Output/Sensor/CentralheatingForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.CentralheatingForward))
+	pubConnection.Publish("heatpump/Output/Sensor/CentralheatingReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.CentralheatingReturn))
+	pubConnection.Publish("heatpump/Output/Sensor/StoragetankHotwater", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.StoragetankHotwater))
+	pubConnection.Publish("heatpump/Output/Sensor/Roomtemperature", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.Roomtemperature))
+	pubConnection.Publish("heatpump/Output/Sensor/StoragetankCentralheating", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.StoragetankCentralheating))
+	pubConnection.Publish("heatpump/Output/Sensor/Outsidetemperature", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.Outsidetemperature))
+	pubConnection.Publish("heatpump/Output/Sensor/Solarheating", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.Solarheating))
+	pubConnection.Publish("heatpump/Output/Sensor/Highpressure", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.Highpressure))
+	pubConnection.Publish("heatpump/Output/Sensor/Lowpressure", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.Lowpressure))
+
+	pubConnection.Publish("heatpump/Output/Relay/Relay1", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay1))
+	pubConnection.Publish("heatpump/Output/Relay/Relay2", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay2))
+	pubConnection.Publish("heatpump/Output/Relay/Relay3", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay3))
+	pubConnection.Publish("heatpump/Output/Relay/Relay4", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay4))
+	pubConnection.Publish("heatpump/Output/Relay/Relay5", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay5))
+	pubConnection.Publish("heatpump/Output/Relay/Relay6", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay6))
+	pubConnection.Publish("heatpump/Output/Relay/Relay7", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay7))
+	pubConnection.Publish("heatpump/Output/Relay/Relay8", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay8))
+	pubConnection.Publish("heatpump/Output/Relay/Relay9", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay9))
+	pubConnection.Publish("heatpump/Output/Relay/Relay10", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay10))
+	pubConnection.Publish("heatpump/Output/Relay/Relay11", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay11))
+	pubConnection.Publish("heatpump/Output/Relay/Relay12", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay12))
+	pubConnection.Publish("heatpump/Output/Relay/Relay13", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay13))
+
 }
