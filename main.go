@@ -7,6 +7,7 @@ import (
 
 	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	"github.com/anderskvist/DVIEnergiSmartControl/influx"
+	"github.com/anderskvist/DVIEnergiSmartControl/mqtt"
 
 	ini "gopkg.in/ini.v1"
 )
@@ -27,5 +28,6 @@ func main() {
 		}
 		dviData := dvi.GetDviData(cfg)
 		influx.SaveToInflux(cfg, dviData)
+		mqtt.SendToMQTT(cfg, dviData)
 	}
 }
