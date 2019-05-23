@@ -15,6 +15,19 @@ import (
 func main() {
 	cfg, err := ini.Load(os.Args[1])
 
+	influxconfig := false
+	mqttconfig := false
+
+	if cfg.Section("influxdb").Key("url").String() != "" {
+		fmt.Println("Activating InfluxDB")
+		influxconfig = true
+	}
+	if cfg.Section("mqtt").Key("url").String() != "" {
+
+		fmt.Println("Activating MQTT")
+		mqttconfig = true
+	}
+
 	if err != nil {
 		fmt.Printf("Fail to read file: %v", err)
 		os.Exit(1)
@@ -27,7 +40,13 @@ func main() {
 		if t == t {
 		}
 		dviData := dvi.GetDviData(cfg)
-		influx.SaveToInflux(cfg, dviData)
-		mqtt.SendToMQTT(cfg, dviData)
+
+		if influxconfig {
+			influx.SaveToInflux(cfg, dviData)
+		}
+
+		if mqttconfig {
+			mqtt.SendToMQTT(cfg, dviData)
+		}
 	}
 }
