@@ -2,16 +2,26 @@ package mqtt
 
 import (
 	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
+	log "github.com/anderskvist/DVIEnergiSmartControl/log"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	ini "gopkg.in/ini.v1"
 
 	"fmt"
-	"log"
 	"net/url"
+	"strconv"
 	"time"
 )
 
 var pubConnection mqtt.Client
+var subConnection mqtt.Client
+
+// temporary until we have read access from DVI
+var CH int = 1
+var CHCurve float64 = 12.0
+var CHTemp float64 = 20.0
+var VV int = 1
+var VVClock int = 0
+var VVTemp float64 = 52.0
 
 func connect(clientId string, uri *url.URL) mqtt.Client {
 	opts := createClientOptions(clientId, uri)
@@ -32,6 +42,7 @@ func createClientOptions(clientId string, uri *url.URL) *mqtt.ClientOptions {
 	password, _ := uri.User.Password()
 	opts.SetPassword(password)
 	opts.SetClientID(clientId)
+	opts.SetCleanSession(true)
 	return opts
 }
 
@@ -40,6 +51,42 @@ func listen(uri *url.URL, topic string) {
 	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
 	})
+}
+
+// MonitorMQTT will monitor MQTT for changes
+func MonitorMQTT(cfg *ini.File) {
+	mqttURL := cfg.Section("mqtt").Key("url").String()
+	uri, err := url.Parse(mqttURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//for {
+	if subConnection == nil {
+		subConnection = connect("sub", uri)
+	}
+
+	subConnection.Subscribe("heatpump/Input/#", 0, func(client mqtt.Client, msg mqtt.Message) {
+		topic := msg.Topic()
+		payload := msg.Payload()
+
+		log.Noticef("[%s] %s\n", topic, string(payload))
+		switch topic {
+		case "heatpump/Input/Set/CH":
+			CH, _ = strconv.Atoi(string(payload))
+		case "heatpump/Input/Set/CHCurve":
+			CHCurve, _ = strconv.ParseFloat(string(payload), 64)
+		case "heatpump/Input/Set/CHTemp":
+			CHTemp, _ = strconv.ParseFloat(string(payload), 64)
+		case "heatpump/Input/Set/VV":
+			VV, _ = strconv.Atoi(string(payload))
+		case "heatpump/Input/Set/VVClock":
+			VVClock, _ = strconv.Atoi(string(payload))
+		case "heatpump/Input/Set/VVTemp":
+			VVTemp, _ = strconv.ParseFloat(string(payload), 64)
+		}
+	})
+	//}
 }
 
 // SendToMQTT will send DVI data to MQTT
@@ -79,4 +126,11 @@ func SendToMQTT(cfg *ini.File, dviData dvi.DVIResponse) {
 	pubConnection.Publish("heatpump/Output/Relay/Relay12", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay12))
 	pubConnection.Publish("heatpump/Output/Relay/Relay13", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay13))
 
+	pubConnection.Publish("heatpump/Output/Set/VV", 0, false, fmt.Sprintf("%d", VV))
+	pubConnection.Publish("heatpump/Output/Set/VVClock", 0, false, fmt.Sprintf("%d", VVClock))
+	pubConnection.Publish("heatpump/Output/Set/VVTemp", 0, false, fmt.Sprintf("%f", VVTemp))
+
+	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", CH))
+	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%f", CHCurve))
+	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%f", CHTemp))
 }

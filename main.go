@@ -26,6 +26,8 @@ func main() {
 	if cfg.Section("mqtt").Key("url").String() != "" {
 		log.Info("Activating MQTT plugin")
 		mqttconfig = true
+
+		go mqtt.MonitorMQTT(cfg)
 	}
 
 	if err != nil {
