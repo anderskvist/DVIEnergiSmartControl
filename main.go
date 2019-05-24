@@ -19,12 +19,11 @@ func main() {
 	mqttconfig := false
 
 	if cfg.Section("influxdb").Key("url").String() != "" {
-		fmt.Println("Activating InfluxDB")
+		log.Info("Activating InfluxDB plugin")
 		influxconfig = true
 	}
 	if cfg.Section("mqtt").Key("url").String() != "" {
-
-		fmt.Println("Activating MQTT")
+		log.Info("Activating MQTT plugin")
 		mqttconfig = true
 	}
 
@@ -34,19 +33,26 @@ func main() {
 	}
 
 	poll := cfg.Section("main").Key("poll").MustInt(60)
-	fmt.Printf("Polltime is %d seconds.\n", poll)
+	log.Infof("Polltime is %d seconds.\n", poll)
 
 	for t := range time.NewTicker(time.Duration(poll) * time.Second).C {
+		log.Debug("Tick")
 		if t == t {
 		}
+		log.Debug("Getting data from DVI")
 		dviData := dvi.GetDviData(cfg)
+		log.Debug("Done getting data from DVI")
 
 		if influxconfig {
+			log.Debug("Saving data to InfluxDB")
 			influx.SaveToInflux(cfg, dviData)
+			log.Debug("Done saving to InfluxDB")
 		}
 
 		if mqttconfig {
+			log.Debug("Sending data to MQTT")
 			mqtt.SendToMQTT(cfg, dviData)
+			log.Debug("Done sending to MQTT")
 		}
 	}
 }
