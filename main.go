@@ -7,6 +7,7 @@ import (
 
 	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	"github.com/anderskvist/DVIEnergiSmartControl/influx"
+	"github.com/anderskvist/DVIEnergiSmartControl/log"
 	"github.com/anderskvist/DVIEnergiSmartControl/mqtt"
 
 	ini "gopkg.in/ini.v1"
