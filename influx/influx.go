@@ -1,9 +1,10 @@
 package influx
 
 import (
-	"log"
 	"strconv"
 	"time"
+
+	log "github.com/anderskvist/DVIEnergiSmartControl/log"
 
 	client "github.com/influxdata/influxdb/client/v2"
 
@@ -90,7 +91,7 @@ func SaveToInflux(cfg *ini.File, dviData dvi.DVIResponse) {
 		time.Now(),
 	)
 	if err != nil {
-		log.Fatalln("Error: ", err)
+		log.Fatal(err)
 	}
 
 	timer_points, err := client.NewPoint(
@@ -100,7 +101,7 @@ func SaveToInflux(cfg *ini.File, dviData dvi.DVIResponse) {
 		time.Now(),
 	)
 	if err != nil {
-		log.Fatalln("Error: ", err)
+		log.Fatal(err)
 	}
 
 	relay_points, err := client.NewPoint(
@@ -110,7 +111,7 @@ func SaveToInflux(cfg *ini.File, dviData dvi.DVIResponse) {
 		time.Now(),
 	)
 	if err != nil {
-		log.Fatalln("Error: ", err)
+		log.Fatal(err)
 	}
 
 	bp.AddPoint(sensor_points)
