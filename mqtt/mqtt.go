@@ -69,22 +69,32 @@ func MonitorMQTT(cfg *ini.File) {
 	subConnection.Subscribe("heatpump/Input/#", 0, func(client mqtt.Client, msg mqtt.Message) {
 		topic := msg.Topic()
 		payload := msg.Payload()
+		set := make(map[string]int)
 
 		log.Noticef("[%s] %s\n", topic, string(payload))
 		switch topic {
 		case "heatpump/Input/Set/CH":
 			CH, _ = strconv.Atoi(string(payload))
-			dvi.SetDVIData(cfg, CH)
+			set["CH"] = CH
 		case "heatpump/Input/Set/CHCurve":
 			CHCurve, _ = strconv.ParseFloat(string(payload), 64)
+			set["CHCurve"] = int(CHCurve)
 		case "heatpump/Input/Set/CHTemp":
 			CHTemp, _ = strconv.ParseFloat(string(payload), 64)
+			set["CHTemp"] = int(CHTemp)
 		case "heatpump/Input/Set/VV":
 			VV, _ = strconv.Atoi(string(payload))
+			set["VV"] = VV
 		case "heatpump/Input/Set/VVClock":
 			VVClock, _ = strconv.Atoi(string(payload))
+			set["VVClock"] = VVClock
 		case "heatpump/Input/Set/VVTemp":
 			VVTemp, _ = strconv.ParseFloat(string(payload), 64)
+			set["VVTemp"] = int(VVTemp)
+		}
+		if len(set) > 0 {
+			log.Infof("Setting to DVI: %#v", set)
+			dvi.SetDVIData(cfg, set)
 		}
 	})
 	//}

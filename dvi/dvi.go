@@ -21,10 +21,10 @@ type DVILoginGet struct {
 
 // DVILoginSet is a type for defining the login at DVI Energi webservice for setting data
 type DVILoginSet struct {
-	Usermail     string `json:"usermail"`
-	Userpassword string `json:"userpassword"`
-	Fabnr        int    `json:"fabnr"`
-	Set          DVISet `json:"set"`
+	Usermail     string         `json:"usermail"`
+	Userpassword string         `json:"userpassword"`
+	Fabnr        int            `json:"fabnr"`
+	Set          map[string]int `json:"set"`
 }
 
 // DVIGet is a type for defining what information to request from DVI Energi webservice
@@ -172,15 +172,14 @@ func GetDviData(cfg *ini.File) DVIResponse {
 }
 
 // SetDVIData is to set data to DVI
-func SetDVIData(cfg *ini.File, CH int) {
+func SetDVIData(cfg *ini.File, set map[string]int) {
 	debug, _ := cfg.Section("main").Key("debug").Bool()
 
 	data := DVILoginSet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
-		Set: DVISet{
-			CH: CH}}
+		Set:          set}
 
 	jsondata, err := json.Marshal(data)
 	if err != nil {
