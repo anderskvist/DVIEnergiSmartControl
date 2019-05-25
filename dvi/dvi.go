@@ -11,12 +11,20 @@ import (
 	ini "gopkg.in/ini.v1"
 )
 
-// DVILogin is a type for defining the login at DVI Energi webservice
-type DVILogin struct {
+// DVILoginGet is a type for defining the login at DVI Energi webservice
+type DVILoginGet struct {
 	Usermail     string `json:"usermail"`
 	Userpassword string `json:"userpassword"`
 	Fabnr        int    `json:"fabnr"`
 	Get          DVIGet `json:"get"`
+}
+
+// DVILoginSet is a type for defining the login at DVI Energi webservice for setting data
+type DVILoginSet struct {
+	Usermail     string `json:"usermail"`
+	Userpassword string `json:"userpassword"`
+	Fabnr        int    `json:"fabnr"`
+	Set          DVISet `json:"set"`
 }
 
 // DVIGet is a type for defining what information to request from DVI Energi webservice
@@ -24,6 +32,13 @@ type DVIGet struct {
 	Sensor int `json:"sensor"`
 	Relay  int `json:"relay"`
 	Timer  int `json:"timer"`
+}
+
+// DVISet is a type for defining what information to set to DVI Energi webservice
+type DVISet struct {
+	CH      int `json:"CH"`
+	CHCurve int `json:"CHCurve"`
+	CHTemp  int `json:"CHTemp"`
 }
 
 // DVIResponse contains
@@ -118,7 +133,8 @@ func jsonPrettyPrint(in string) string {
 func GetDviData(cfg *ini.File) DVIResponse {
 
 	debug, _ := cfg.Section("main").Key("debug").Bool()
-	data := DVILogin{
+	debug = false
+	data := DVILoginGet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
@@ -153,4 +169,43 @@ func GetDviData(cfg *ini.File) DVIResponse {
 		}
 	}
 	return dviData
+}
+
+// SetDVIData is to set data to DVI
+func SetDVIData(cfg *ini.File, CH int) {
+	debug, _ := cfg.Section("main").Key("debug").Bool()
+
+	data := DVILoginSet{
+		Usermail:     cfg.Section("login").Key("usermail").String(),
+		Userpassword: cfg.Section("login").Key("userpassword").String(),
+		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
+		Set: DVISet{
+			CH: CH}}
+
+	jsondata, err := json.Marshal(data)
+	if err != nil {
+		fmt.Printf("Could not convert data to json: %s\n", err)
+	} else {
+		if debug {
+			fmt.Println(jsonPrettyPrint(string(maskPassword(string(jsondata)))))
+		}
+	}
+
+	var dviData DVIResponse
+	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	} else {
+		data, _ := ioutil.ReadAll(response.Body)
+
+		if debug {
+			fmt.Println(jsonPrettyPrint(string(maskPassword(string(data)))))
+		}
+
+		err := json.Unmarshal(data, &dviData)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 }

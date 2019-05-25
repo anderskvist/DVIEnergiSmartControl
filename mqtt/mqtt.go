@@ -74,6 +74,7 @@ func MonitorMQTT(cfg *ini.File) {
 		switch topic {
 		case "heatpump/Input/Set/CH":
 			CH, _ = strconv.Atoi(string(payload))
+			dvi.SetDVIData(cfg, CH)
 		case "heatpump/Input/Set/CHCurve":
 			CHCurve, _ = strconv.ParseFloat(string(payload), 64)
 		case "heatpump/Input/Set/CHTemp":
