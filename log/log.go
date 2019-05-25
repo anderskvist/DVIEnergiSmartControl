@@ -4,6 +4,7 @@ import (
 	"os"
 
 	logging "github.com/op/go-logging"
+	ini "gopkg.in/ini.v1"
 )
 
 var log = logging.MustGetLogger("example")
@@ -12,16 +13,20 @@ var format = logging.MustStringFormatter(
 )
 
 func init() {
-	backend1 := logging.NewLogBackend(os.Stderr, "", 0)
-	backend2 := logging.NewLogBackend(os.Stderr, "", 0)
-	backend2Formatter := logging.NewBackendFormatter(backend2, format)
+	cfg, _ := ini.Load(os.Args[1])
+	loglevel := cfg.Section("main").Key("loglevel").String()
+	level, _ := logging.LogLevel(loglevel)
 
-	// Only errors and more severe messages should be sent to backend1
-	backend1Leveled := logging.AddModuleLevel(backend1)
-	backend1Leveled.SetLevel(logging.ERROR, "")
+	backend := logging.NewLogBackend(os.Stderr, "", 0)
+	backendFormatter := logging.NewBackendFormatter(backend, format)
+
+	backendLeveled := logging.AddModuleLevel(backendFormatter)
+	backendLeveled.SetLevel(level, "")
 
 	// Set the backends to be used.
-	logging.SetBackend(backend1Leveled, backend2Formatter)
+	logging.SetBackend(backendLeveled)
+
+	Noticef("Enabling logging at loglevel: %s\n", logging.GetLevel("example"))
 }
 
 // Debug blah blah blah
