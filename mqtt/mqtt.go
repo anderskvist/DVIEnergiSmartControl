@@ -61,7 +61,6 @@ func MonitorMQTT(cfg *ini.File) {
 		log.Fatal(err)
 	}
 
-	//for {
 	if subConnection == nil {
 		subConnection = connect("sub", uri)
 	}
@@ -97,7 +96,6 @@ func MonitorMQTT(cfg *ini.File) {
 			dvi.SetDVIData(cfg, set)
 		}
 	})
-	//}
 }
 
 // SendToMQTT will send DVI data to MQTT
