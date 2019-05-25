@@ -3,10 +3,11 @@ package dvi
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+
+	log "github.com/anderskvist/DVIEnergiSmartControl/log"
 
 	ini "gopkg.in/ini.v1"
 )
@@ -128,8 +129,6 @@ func jsonPrettyPrint(in string) string {
 
 // GetDviData is to get data from DVI
 func GetDviData(cfg *ini.File) Response {
-
-	debug, _ := cfg.Section("main").Key("debug").Bool()
 	data := LoginGet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
@@ -141,23 +140,19 @@ func GetDviData(cfg *ini.File) Response {
 
 	jsondata, err := json.Marshal(data)
 	if err != nil {
-		fmt.Printf("Could not convert data to json: %s\n", err)
+		log.Errorf("Could not convert data to json: %s\n", err)
 	} else {
-		if debug {
-			fmt.Println(jsonPrettyPrint(string(maskPassword(string(jsondata)))))
-		}
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(jsondata)))))
 	}
 
 	var dviData Response
 	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
 	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
+		log.Errorf("The HTTP request failed with error %s\n", err)
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
 
-		if debug {
-			fmt.Println(jsonPrettyPrint(string(maskPassword(string(data)))))
-		}
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(data)))))
 
 		err := json.Unmarshal(data, &dviData)
 		if err != nil {
@@ -169,8 +164,6 @@ func GetDviData(cfg *ini.File) Response {
 
 // SetDVIData is to set data to DVI
 func SetDVIData(cfg *ini.File, set map[string]int) {
-	debug, _ := cfg.Section("main").Key("debug").Bool()
-
 	data := LoginSet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
@@ -179,23 +172,19 @@ func SetDVIData(cfg *ini.File, set map[string]int) {
 
 	jsondata, err := json.Marshal(data)
 	if err != nil {
-		fmt.Printf("Could not convert data to json: %s\n", err)
+		log.Errorf("Could not convert data to json: %s\n", err)
 	} else {
-		if debug {
-			fmt.Println(jsonPrettyPrint(string(maskPassword(string(jsondata)))))
-		}
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(jsondata)))))
 	}
 
 	var dviData Response
 	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
 	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
+		log.Debugf("The HTTP request failed with error %s\n", err)
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
 
-		if debug {
-			fmt.Println(jsonPrettyPrint(string(maskPassword(string(data)))))
-		}
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(data)))))
 
 		err := json.Unmarshal(data, &dviData)
 		if err != nil {

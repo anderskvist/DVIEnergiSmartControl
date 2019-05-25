@@ -34,6 +34,11 @@ func Debug(args ...interface{}) {
 	log.Debug(args...)
 }
 
+// Error blah blah blah
+func Error(args ...interface{}) {
+	log.Error(args...)
+}
+
 // Fatal blah blah blah
 func Fatal(args ...interface{}) {
 	log.Fatal(args...)
@@ -47,6 +52,21 @@ func Info(args ...interface{}) {
 // Notice blah blah blah
 func Notice(args ...interface{}) {
 	log.Notice(args...)
+}
+
+// Debugf blah blah blah
+func Debugf(format string, args ...interface{}) {
+	log.Debugf(format, args...)
+}
+
+// Errorf blah blah blah
+func Errorf(format string, args ...interface{}) {
+	log.Errorf(format, args...)
+}
+
+// Fatalf blah blah blah
+func Fatalf(format string, args ...interface{}) {
+	log.Fatalf(format, args...)
 }
 
 // Infof blah blah blah
