@@ -11,52 +11,52 @@ import (
 	ini "gopkg.in/ini.v1"
 )
 
-// DVILoginGet is a type for defining the login at DVI Energi webservice
-type DVILoginGet struct {
+// LoginGet is a type for defining the login at DVI Energi webservice
+type LoginGet struct {
 	Usermail     string `json:"usermail"`
 	Userpassword string `json:"userpassword"`
 	Fabnr        int    `json:"fabnr"`
-	Get          DVIGet `json:"get"`
+	Get          Get    `json:"get"`
 }
 
-// DVILoginSet is a type for defining the login at DVI Energi webservice for setting data
-type DVILoginSet struct {
+// LoginSet is a type for defining the login at DVI Energi webservice for setting data
+type LoginSet struct {
 	Usermail     string         `json:"usermail"`
 	Userpassword string         `json:"userpassword"`
 	Fabnr        int            `json:"fabnr"`
 	Set          map[string]int `json:"set"`
 }
 
-// DVIGet is a type for defining what information to request from DVI Energi webservice
-type DVIGet struct {
+// Get is a type for defining what information to request from DVI Energi webservice
+type Get struct {
 	Sensor int `json:"sensor"`
 	Relay  int `json:"relay"`
 	Timer  int `json:"timer"`
 }
 
-// DVISet is a type for defining what information to set to DVI Energi webservice
-type DVISet struct {
+// Set is a type for defining what information to set to DVI Energi webservice
+type Set struct {
 	CH      int `json:"CH"`
 	CHCurve int `json:"CHCurve"`
 	CHTemp  int `json:"CHTemp"`
 }
 
-// DVIResponse contains
-type DVIResponse struct {
-	Access string            `json:"Access"`
-	Fabnr  int               `json:"fabnr"`
-	Output DVIResponseOutput `json:"output"`
+// Response contains
+type Response struct {
+	Access string         `json:"Access"`
+	Fabnr  int            `json:"fabnr"`
+	Output ResponseOutput `json:"output"`
 }
 
-// DVIResponseOutput contains
-type DVIResponseOutput struct {
-	Sensor DVIResponseOutputSensor `json:"sensor"`
-	Relay  DVIResponseOutputRelay  `json:"relay"`
-	Timer  DVIResponseOutputTimer  `json:"timer"`
+// ResponseOutput contains
+type ResponseOutput struct {
+	Sensor ResponseOutputSensor `json:"sensor"`
+	Relay  ResponseOutputRelay  `json:"relay"`
+	Timer  ResponseOutputTimer  `json:"timer"`
 }
 
-// DVIResponseOutputSensor contains sensor data
-type DVIResponseOutputSensor struct {
+// ResponseOutputSensor contains sensor data
+type ResponseOutputSensor struct {
 	SensorDate                string  `json:"Sensor.Date"`
 	CentralheatingForward     float32 `json:"Centralheating.Forward,string"`
 	CentralheatingReturn      float32 `json:"Centralheating.Return,string"`
@@ -81,8 +81,8 @@ type DVIResponseOutputSensor struct {
 	PowermeterKWh             float32 `json:"Powermeter.kWh,string"`
 }
 
-// DVIResponseOutputRelay contains relay data
-type DVIResponseOutputRelay struct {
+// ResponseOutputRelay contains relay data
+type ResponseOutputRelay struct {
 	Relay1  int `json:"Relay1,string"`
 	Relay2  int `json:"Relay2,string"`
 	Relay3  int `json:"Relay3,string"`
@@ -99,8 +99,8 @@ type DVIResponseOutputRelay struct {
 	Relay14 int `json:"Relay14,string"`
 }
 
-// DVIResponseOutputTimer contains strings, but currently data is integer - this may be changed to floating point numbers later
-type DVIResponseOutputTimer struct {
+// ResponseOutputTimer contains strings, but currently data is integer - this may be changed to floating point numbers later
+type ResponseOutputTimer struct {
 	Compressor    int `json:"compressor,string"`
 	Warmwater     int `json:"warmwater,string"`
 	Pluswarm      int `json:"pluswarm,string"`
@@ -127,15 +127,15 @@ func jsonPrettyPrint(in string) string {
 }
 
 // GetDviData is to get data from DVI
-func GetDviData(cfg *ini.File) DVIResponse {
+func GetDviData(cfg *ini.File) Response {
 
 	debug, _ := cfg.Section("main").Key("debug").Bool()
 	debug = false
-	data := DVILoginGet{
+	data := LoginGet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
-		Get: DVIGet{
+		Get: Get{
 			Sensor: cfg.Section("get").Key("sensor").MustInt(0),
 			Relay:  cfg.Section("get").Key("relay").MustInt(0),
 			Timer:  cfg.Section("get").Key("timer").MustInt(0)}}
@@ -149,7 +149,7 @@ func GetDviData(cfg *ini.File) DVIResponse {
 		}
 	}
 
-	var dviData DVIResponse
+	var dviData Response
 	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
@@ -172,7 +172,7 @@ func GetDviData(cfg *ini.File) DVIResponse {
 func SetDVIData(cfg *ini.File, set map[string]int) {
 	debug, _ := cfg.Section("main").Key("debug").Bool()
 
-	data := DVILoginSet{
+	data := LoginSet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
@@ -187,7 +187,7 @@ func SetDVIData(cfg *ini.File, set map[string]int) {
 		}
 	}
 
-	var dviData DVIResponse
+	var dviData Response
 	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
@@ -203,5 +203,4 @@ func SetDVIData(cfg *ini.File, set map[string]int) {
 			panic(err)
 		}
 	}
-
 }

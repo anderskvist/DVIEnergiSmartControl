@@ -12,7 +12,7 @@ import (
 	ini "gopkg.in/ini.v1"
 )
 
-func SaveToInflux(cfg *ini.File, dviData dvi.DVIResponse) {
+func SaveToInflux(cfg *ini.File, dviData dvi.Response) {
 
 	c, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:     cfg.Section("influxdb").Key("url").String(),

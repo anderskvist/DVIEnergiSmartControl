@@ -99,7 +99,7 @@ func MonitorMQTT(cfg *ini.File) {
 }
 
 // SendToMQTT will send DVI data to MQTT
-func SendToMQTT(cfg *ini.File, dviData dvi.DVIResponse) {
+func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	mqttURL := cfg.Section("mqtt").Key("url").String()
 	uri, err := url.Parse(mqttURL)
 	if err != nil {
