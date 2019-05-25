@@ -13,7 +13,13 @@ var format = logging.MustStringFormatter(
 )
 
 func init() {
-	cfg, _ := ini.Load(os.Args[1])
+	cfg, err := ini.Load(os.Args[1])
+
+	if err != nil {
+		log.Criticalf("Fail to read file: %v", err)
+		os.Exit(1)
+	}
+
 	loglevel := cfg.Section("main").Key("loglevel").String()
 	level, _ := logging.LogLevel(loglevel)
 
@@ -27,6 +33,11 @@ func init() {
 	logging.SetBackend(backendLeveled)
 
 	Noticef("Enabling logging at loglevel: %s\n", logging.GetLevel("example"))
+}
+
+// Critical blah blah blah
+func Critical(args ...interface{}) {
+	log.Critical(args...)
 }
 
 // Debug blah blah blah
@@ -52,6 +63,11 @@ func Info(args ...interface{}) {
 // Notice blah blah blah
 func Notice(args ...interface{}) {
 	log.Notice(args...)
+}
+
+// Criticalf blah blah blah
+func Criticalf(format string, args ...interface{}) {
+	log.Criticalf(format, args...)
 }
 
 // Debugf blah blah blah

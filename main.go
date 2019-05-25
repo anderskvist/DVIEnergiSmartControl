@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -16,6 +15,11 @@ import (
 func main() {
 	cfg, err := ini.Load(os.Args[1])
 
+	if err != nil {
+		log.Criticalf("Fail to read file: %v", err)
+		os.Exit(1)
+	}
+
 	influxconfig := false
 	mqttconfig := false
 
@@ -28,11 +32,6 @@ func main() {
 		mqttconfig = true
 
 		go mqtt.MonitorMQTT(cfg)
-	}
-
-	if err != nil {
-		fmt.Printf("Fail to read file: %v", err)
-		os.Exit(1)
 	}
 
 	poll := cfg.Section("main").Key("poll").MustInt(60)
