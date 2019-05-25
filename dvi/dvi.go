@@ -130,7 +130,6 @@ func jsonPrettyPrint(in string) string {
 func GetDviData(cfg *ini.File) Response {
 
 	debug, _ := cfg.Section("main").Key("debug").Bool()
-	debug = false
 	data := LoginGet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
