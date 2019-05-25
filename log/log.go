@@ -20,7 +20,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	loglevel := cfg.Section("main").Key("loglevel").String()
+	loglevel := cfg.Section("main").Key("loglevel").MustString("info")
 	level, _ := logging.LogLevel(loglevel)
 
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
