@@ -38,23 +38,23 @@ func main() {
 	log.Infof("Polltime is %d seconds.\n", poll)
 
 	for t := range time.NewTicker(time.Duration(poll) * time.Second).C {
-		log.Debug("Tick")
+		log.Notice("Tick")
 		if t == t {
 		}
-		log.Debug("Getting data from DVI")
+		log.Info("Getting data from DVI")
 		dviData := dvi.GetDviData(cfg)
-		log.Debug("Done getting data from DVI")
+		log.Info("Done getting data from DVI")
 
 		if influxconfig {
-			log.Debug("Saving data to InfluxDB")
+			log.Info("Saving data to InfluxDB")
 			influx.SaveToInflux(cfg, dviData)
-			log.Debug("Done saving to InfluxDB")
+			log.Info("Done saving to InfluxDB")
 		}
 
 		if mqttconfig {
-			log.Debug("Sending data to MQTT")
+			log.Info("Sending data to MQTT")
 			mqtt.SendToMQTT(cfg, dviData)
-			log.Debug("Done sending to MQTT")
+			log.Info("Done sending to MQTT")
 		}
 	}
 }
