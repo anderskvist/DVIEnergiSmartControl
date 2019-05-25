@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	log "github.com/anderskvist/DVIEnergiSmartControl/log"
-
 	ini "gopkg.in/ini.v1"
 )
 
