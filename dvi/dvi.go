@@ -46,9 +46,6 @@ type DVIResponse struct {
 	Access string            `json:"Access"`
 	Fabnr  int               `json:"fabnr"`
 	Output DVIResponseOutput `json:"output"`
-	//	Output []struct {
-	//	name string
-	//	}
 }
 
 // DVIResponseOutput contains
