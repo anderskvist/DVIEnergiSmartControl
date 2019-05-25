@@ -46,13 +46,6 @@ func createClientOptions(clientId string, uri *url.URL) *mqtt.ClientOptions {
 	return opts
 }
 
-func listen(uri *url.URL, topic string) {
-	client := connect("sub", uri)
-	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
-	})
-}
-
 // MonitorMQTT will monitor MQTT for changes
 func MonitorMQTT(cfg *ini.File) {
 	mqttURL := cfg.Section("mqtt").Key("url").String()
