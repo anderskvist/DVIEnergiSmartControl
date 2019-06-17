@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"sync"
 	"time"
 
 	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	cfg, err := ini.Load(os.Args[1])
+	var wg sync.WaitGroup
+	wg.Add(1)
 
 	if err != nil {
 		log.Criticalf("Fail to read file: %v", err)
@@ -37,24 +40,28 @@ func main() {
 	poll := cfg.Section("main").Key("poll").MustInt(60)
 	log.Infof("Polltime is %d seconds.\n", poll)
 
-	for t := range time.NewTicker(time.Duration(poll) * time.Second).C {
-		log.Notice("Tick")
-		if t == t {
-		}
-		log.Info("Getting data from DVI")
-		dviData := dvi.GetDviData(cfg)
-		log.Info("Done getting data from DVI")
+	ticker := time.NewTicker(time.Duration(poll) * time.Second)
+	defer ticker.Stop()
+	go func() {
+		for ; true; <-ticker.C {
 
-		if influxconfig {
-			log.Info("Saving data to InfluxDB")
-			influx.SaveToInflux(cfg, dviData)
-			log.Info("Done saving to InfluxDB")
-		}
+			log.Notice("Tick")
+			log.Info("Getting data from DVI")
+			dviData := dvi.GetDviData(cfg)
+			log.Info("Done getting data from DVI")
 
-		if mqttconfig {
-			log.Info("Sending data to MQTT")
-			mqtt.SendToMQTT(cfg, dviData)
-			log.Info("Done sending to MQTT")
+			if influxconfig {
+				log.Info("Saving data to InfluxDB")
+				influx.SaveToInflux(cfg, dviData)
+				log.Info("Done saving to InfluxDB")
+			}
+
+			if mqttconfig {
+				log.Info("Sending data to MQTT")
+				mqtt.SendToMQTT(cfg, dviData)
+				log.Info("Done sending to MQTT")
+			}
 		}
-	}
+	}()
+	wg.Wait()
 }
