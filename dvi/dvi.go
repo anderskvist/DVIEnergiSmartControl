@@ -29,9 +29,10 @@ type LoginSet struct {
 
 // Get is a type for defining what information to request from DVI Energi webservice
 type Get struct {
-	Sensor int `json:"sensor"`
-	Relay  int `json:"relay"`
-	Timer  int `json:"timer"`
+	Sensor       int `json:"sensor"`
+	Relay        int `json:"relay"`
+	Timer        int `json:"timer"`
+	UserSettings int `json:"userSettings"`
 }
 
 // Set is a type for defining what information to set to DVI Energi webservice
@@ -50,9 +51,10 @@ type Response struct {
 
 // ResponseOutput contains
 type ResponseOutput struct {
-	Sensor ResponseOutputSensor `json:"sensor"`
-	Relay  ResponseOutputRelay  `json:"relay"`
-	Timer  ResponseOutputTimer  `json:"timer"`
+	Sensor       ResponseOutputSensor       `json:"sensor"`
+	Relay        ResponseOutputRelay        `json:"relay"`
+	Timer        ResponseOutputTimer        `json:"timer"`
+	UserSettings ResponseOutputUserSettings `json:"userSettings"`
 }
 
 // ResponseOutputSensor contains sensor data
@@ -110,6 +112,17 @@ type ResponseOutputTimer struct {
 	Cooling       int `json:"cooling,string"`
 }
 
+// ResponseOutputUserSettings contains user settings
+type ResponseOutputUserSettings struct {
+	CentralheatCurve     int     `json:"Centralheat.Curve,string"`
+	CentralheatCurveTemp float32 `json:"Centralheat.CurveTemp,string"`
+	CentralheatState     int     `json:"Centralheat.State,string"`
+	CentralheatTemp      int     `json:"Centralheat.Temp,string"`
+	HotwaterClock        int     `json:"Hotwater.Clock,string"`
+	HotwaterState        int     `json:"Hotwater.State,string"`
+	HotwaterTemp         int     `json:"Hotwater.Temp,string"`
+}
+
 // maskPassword will find password in the json string and mask it
 func maskPassword(json string) string {
 	var regex = regexp.MustCompile(`userpassword\":([ ]?)\"([a-zA-Z0-9]+)\"`)
@@ -133,9 +146,10 @@ func GetDviData(cfg *ini.File) Response {
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
 		Fabnr:        cfg.Section("login").Key("fabnr").MustInt(),
 		Get: Get{
-			Sensor: cfg.Section("get").Key("sensor").MustInt(0),
-			Relay:  cfg.Section("get").Key("relay").MustInt(0),
-			Timer:  cfg.Section("get").Key("timer").MustInt(0)}}
+			Sensor:       cfg.Section("get").Key("sensor").MustInt(0),
+			Relay:        cfg.Section("get").Key("relay").MustInt(0),
+			Timer:        cfg.Section("get").Key("timer").MustInt(0),
+			UserSettings: cfg.Section("get").Key("usersettings").MustInt(0)}}
 
 	jsondata, err := json.Marshal(data)
 	if err != nil {
