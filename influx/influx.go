@@ -82,6 +82,15 @@ func SaveToInflux(cfg *ini.File, dviData dvi.Response) {
 		"Relay14": dviData.Output.Relay.Relay14,
 	}
 
+	usersettings := map[string]interface{}{
+		"CentralheatState":     dviData.Output.UserSettings.CentralheatState,
+		"CentralheatCurve":     dviData.Output.UserSettings.CentralheatCurve,
+		"CentralheatCurveTemp": dviData.Output.UserSettings.CentralheatCurveTemp,
+		"CentralheatTemp":      dviData.Output.UserSettings.CentralheatTemp,
+		"HotwaterState":        dviData.Output.UserSettings.HotwaterState,
+		"HotwaterTemp":         dviData.Output.UserSettings.HotwaterTemp,
+		"HotwaterClock":        dviData.Output.UserSettings.HotwaterClock,
+	}
 	sensor_points, err := client.NewPoint(
 		"sensor",
 		tags,
@@ -112,9 +121,20 @@ func SaveToInflux(cfg *ini.File, dviData dvi.Response) {
 		log.Fatal(err)
 	}
 
+	usersettings_points, err := client.NewPoint(
+		"usersettings",
+		tags,
+		usersettings,
+		time.Now(),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	bp.AddPoint(sensor_points)
 	bp.AddPoint(timer_points)
 	bp.AddPoint(relay_points)
+	bp.AddPoint(usersettings_points)
 
 	// Write the batch
 	if err := c.Write(bp); err != nil {
