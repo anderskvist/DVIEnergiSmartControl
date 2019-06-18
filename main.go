@@ -37,10 +37,9 @@ func main() {
 	poll := cfg.Section("main").Key("poll").MustInt(60)
 	log.Infof("Polltime is %d seconds.\n", poll)
 
-	for t := range time.NewTicker(time.Duration(poll) * time.Second).C {
+	ticker := time.NewTicker(time.Duration(poll) * time.Second)
+	for ; true; <-ticker.C {
 		log.Notice("Tick")
-		if t == t {
-		}
 		log.Info("Getting data from DVI")
 		dviData := dvi.GetDviData(cfg)
 		log.Info("Done getting data from DVI")
