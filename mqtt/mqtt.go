@@ -15,14 +15,6 @@ import (
 var pubConnection mqtt.Client
 var subConnection mqtt.Client
 
-// temporary until we have read access from DVI
-var CH int = 1
-var CHCurve float64 = 12.0
-var CHTemp float64 = 20.0
-var VV int = 1
-var VVClock int = 0
-var VVTemp float64 = 52.0
-
 func connect(clientId string, uri *url.URL) mqtt.Client {
 	opts := createClientOptions(clientId, uri)
 	client := mqtt.NewClient(opts)
@@ -66,23 +58,23 @@ func MonitorMQTT(cfg *ini.File) {
 		log.Noticef("[%s] %s\n", topic, string(payload))
 		switch topic {
 		case "heatpump/Input/Set/CH":
-			CH, _ = strconv.Atoi(string(payload))
-			set["CH"] = CH
+			temp, _ := strconv.Atoi(string(payload))
+			set["CH"] = temp
 		case "heatpump/Input/Set/CHCurve":
-			CHCurve, _ = strconv.ParseFloat(string(payload), 64)
-			set["CHCurve"] = int(CHCurve)
+			temp, _ := strconv.ParseFloat(string(payload), 64)
+			set["CHCurve"] = int(temp)
 		case "heatpump/Input/Set/CHTemp":
-			CHTemp, _ = strconv.ParseFloat(string(payload), 64)
-			set["CHTemp"] = int(CHTemp)
+			temp, _ := strconv.ParseFloat(string(payload), 64)
+			set["CHTemp"] = int(temp)
 		case "heatpump/Input/Set/VV":
-			VV, _ = strconv.Atoi(string(payload))
-			set["VV"] = VV
+			temp, _ := strconv.Atoi(string(payload))
+			set["VV"] = temp
 		case "heatpump/Input/Set/VVClock":
-			VVClock, _ = strconv.Atoi(string(payload))
-			set["VVClock"] = VVClock
+			temp, _ := strconv.Atoi(string(payload))
+			set["VVClock"] = temp
 		case "heatpump/Input/Set/VVTemp":
-			VVTemp, _ = strconv.ParseFloat(string(payload), 64)
-			set["VVTemp"] = int(VVTemp)
+			temp, _ := strconv.ParseFloat(string(payload), 64)
+			set["VVTemp"] = int(temp)
 		}
 		if len(set) > 0 {
 			log.Infof("Setting to DVI: %#v", set)
@@ -128,11 +120,11 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	pubConnection.Publish("heatpump/Output/Relay/Relay12", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay12))
 	pubConnection.Publish("heatpump/Output/Relay/Relay13", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay13))
 
-	pubConnection.Publish("heatpump/Output/Set/VV", 0, false, fmt.Sprintf("%d", VV))
-	pubConnection.Publish("heatpump/Output/Set/VVClock", 0, false, fmt.Sprintf("%d", VVClock))
-	pubConnection.Publish("heatpump/Output/Set/VVTemp", 0, false, fmt.Sprintf("%f", VVTemp))
+	pubConnection.Publish("heatpump/Output/Set/VV", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterState))
+	pubConnection.Publish("heatpump/Output/Set/VVClock", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterClock))
+	pubConnection.Publish("heatpump/Output/Set/VVTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterTemp))
 
-	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", CH))
-	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%f", CHCurve))
-	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%f", CHTemp))
+	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatState))
+	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatCurve))
+	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatTemp))
 }
