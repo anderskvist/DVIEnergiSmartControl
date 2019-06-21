@@ -92,7 +92,7 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	}
 
 	if pubConnection == nil {
-		pubConnection = connect("pub", uri)
+		pubConnection = connect("DVIEnergiSmartControl", uri)
 	}
 	pubConnection.Publish("heatpump/Output/Sensor/BrineForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineForward))
 	pubConnection.Publish("heatpump/Output/Sensor/BrineReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineReturn))
