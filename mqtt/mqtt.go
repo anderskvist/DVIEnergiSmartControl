@@ -47,7 +47,7 @@ func MonitorMQTT(cfg *ini.File) {
 	}
 
 	if subConnection == nil {
-		subConnection = connect("sub", uri)
+		subConnection = connect("DVIEnergiSmartControl", uri)
 	}
 
 	subConnection.Subscribe("heatpump/Input/#", 0, func(client mqtt.Client, msg mqtt.Message) {
