@@ -47,7 +47,8 @@ func MonitorMQTT(cfg *ini.File) {
 	}
 
 	if subConnection == nil {
-		subConnection = connect("DVIEnergiSmartControl", uri)
+		subConnection = connect("DVIEnergiSmartControl-sub", uri)
+		log.Debug("Connecting to MQTT (sub)")
 	}
 
 	subConnection.Subscribe("heatpump/Input/#", 0, func(client mqtt.Client, msg mqtt.Message) {
@@ -92,8 +93,8 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	}
 
 	if pubConnection == nil {
-		pubConnection = connect("DVIEnergiSmartControl", uri)
-		log.Debug("Connecting to MQTT")
+		pubConnection = connect("DVIEnergiSmartControl-pub", uri)
+		log.Debug("Connecting to MQTT (pub)")
 	}
 	pubConnection.Publish("heatpump/Output/Sensor/BrineForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineForward))
 	pubConnection.Publish("heatpump/Output/Sensor/BrineReturn", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineReturn))
