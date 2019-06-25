@@ -22,7 +22,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Infof("GoRenoWeb version: %s.\n", version.Version)
+	log.Infof("DVIEnergiSmartControl version: %s.\n", version.Version)
 
 	influxconfig := false
 	mqttconfig := false
