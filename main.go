@@ -4,6 +4,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/anderskvist/GoHelpers/version"
+
 	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	"github.com/anderskvist/DVIEnergiSmartControl/influx"
 	"github.com/anderskvist/DVIEnergiSmartControl/log"
@@ -19,6 +21,8 @@ func main() {
 		log.Criticalf("Fail to read file: %v", err)
 		os.Exit(1)
 	}
+
+	log.Infof("GoRenoWeb version: %s.\n", version.Version)
 
 	influxconfig := false
 	mqttconfig := false
