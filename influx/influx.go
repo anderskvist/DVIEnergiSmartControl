@@ -5,7 +5,7 @@ import (
 	"time"
 
 	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
-	log "github.com/anderskvist/DVIEnergiSmartControl/log"
+	log "github.com/anderskvist/GoHelpers/log"
 	client "github.com/influxdata/influxdb1-client/v2"
 	ini "gopkg.in/ini.v1"
 )

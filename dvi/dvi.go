@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"regexp"
 
-	log "github.com/anderskvist/DVIEnergiSmartControl/log"
+	log "github.com/anderskvist/GoHelpers/log"
 	ini "gopkg.in/ini.v1"
 )
 

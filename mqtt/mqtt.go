@@ -2,7 +2,7 @@ package mqtt
 
 import (
 	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
-	log "github.com/anderskvist/DVIEnergiSmartControl/log"
+	log "github.com/anderskvist/GoHelpers/log"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	ini "gopkg.in/ini.v1"
 

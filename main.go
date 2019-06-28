@@ -4,11 +4,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/anderskvist/GoHelpers/log"
 	"github.com/anderskvist/GoHelpers/version"
 
 	"github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	"github.com/anderskvist/DVIEnergiSmartControl/influx"
-	"github.com/anderskvist/DVIEnergiSmartControl/log"
 	"github.com/anderskvist/DVIEnergiSmartControl/mqtt"
 
 	ini "gopkg.in/ini.v1"
