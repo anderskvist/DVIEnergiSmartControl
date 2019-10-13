@@ -38,6 +38,11 @@ func main() {
 		go mqtt.MonitorMQTT(cfg)
 	}
 
+	// Send auto discovery for Home Assistant
+	if cfg.Section("homeassistant").Key("autodiscovery").MustBool(false) == true {
+		mqtt.HomeAssistantAutoDiscovery(cfg)
+	}
+
 	poll := cfg.Section("main").Key("poll").MustInt(60)
 	log.Infof("Polltime is %d seconds.\n", poll)
 

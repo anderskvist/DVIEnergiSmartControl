@@ -1,6 +1,9 @@
 package mqtt
 
 import (
+	"encoding/json"
+	"os"
+
 	dvi "github.com/anderskvist/DVIEnergiSmartControl/dvi"
 	log "github.com/anderskvist/GoHelpers/log"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -12,8 +15,66 @@ import (
 	"time"
 )
 
+// HAHVAC is a struct to help auto discovery in Home Assistant
+type HAHVAC struct {
+	Name                    string   `json:"name"`
+	Qos                     int      `json:"qos,omitempty"`
+	PayloadOn               int      `json:"payload_on,omitempty"`
+	PayloadOff              int      `json:"payload_off,omitempty"`
+	PowerCommandTopic       string   `json:"power_command_topic,omitempty"`
+	Modes                   []string `json:"modes,omitempty"`
+	ModeStateTopic          string   `json:"mode_state_topic,omitempty"`
+	ModeStateTemplate       string   `json:"mode_state_template,omitempty"`
+	ModeCommandTopic        string   `json:"mode_command_topic,omitempty"`
+	CurrentTemperatureTopic string   `json:"current_temperature_topic,omitempty"`
+	MinTemp                 int      `json:"min_temp,omitempty"`
+	MaxTemp                 int      `json:"max_temp,omitempty"`
+	TempStep                int      `json:"temp_step,omitempty"`
+	TemperatureCommandTopic string   `json:"temperature_command_topic,omitempty"`
+	TemperatureStateTopic   string   `json:"temperature_state_topic,omitifempty"`
+	Retain                  bool     `json:"retain,omitempty"`
+}
+
 var pubConnection mqtt.Client
 var subConnection mqtt.Client
+
+var (
+	hotWaterHVAC = HAHVAC{
+		Name:                    "DVI heat pump - hot water",
+		Qos:                     2,
+		TemperatureStateTopic:   "heatpump/Output/Set/VVTemp",
+		TemperatureCommandTopic: "heatpump/Input/Set/VVTemp",
+		CurrentTemperatureTopic: "heatpump/Output/Sensor/StoragetankHotwater",
+		MinTemp:                 45,
+		MaxTemp:                 55,
+		TempStep:                1,
+		Retain:                  true,
+		PowerCommandTopic:       "heatpump/Input/Set/VV",
+		PayloadOn:               1,
+		PayloadOff:              0,
+		Modes:                   []string{"Clock", "Constant On", "Constant Off"},
+		ModeStateTopic:          "heatpump/Output/Set/VVClock",
+		ModeStateTemplate:       "{% set modes = { '0':'Clock', '1':'Constant On',  '2':'Constant Off'} %}{{ modes[value] if value in modes.keys() else 'off' }}",
+		ModeCommandTopic:        "convert/VVClock",
+	}
+	centralHeatingHVAC = HAHVAC{
+		Name:                    "DVI heat pump - heating curve",
+		Qos:                     2,
+		TemperatureStateTopic:   "heatpump/Output/Set/CHCurve",
+		TemperatureCommandTopic: "heatpump/Input/Set/CHCurve",
+		CurrentTemperatureTopic: "heatpump/Output/Sensor/CentralheatingForward",
+		MinTemp:                 0,
+		MaxTemp:                 20,
+		TempStep:                1,
+		Retain:                  true,
+		Modes:                   []string{"Off", "On"},
+		ModeStateTopic:          "heatpump/Output/Set/CH",
+		ModeStateTemplate:       "{% set modes = { '0':'Off', '1':'On'} %}{{ modes[value] if value in modes.keys() else 'Off' }}",
+		ModeCommandTopic:        "convert/CH",
+	}
+
+	MQTTClientID = "DVIEnergiSmartControl-pub" + string(os.Getpid())
+)
 
 func connect(clientId string, uri *url.URL) mqtt.Client {
 	opts := createClientOptions(clientId, uri)
@@ -129,4 +190,26 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatState))
 	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatCurve))
 	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatTemp))
+}
+
+// HomeAssistantAutoDiscovery will send DVI data to MQTT
+func HomeAssistantAutoDiscovery(cfg *ini.File) {
+	mqttURL := cfg.Section("mqtt").Key("url").String()
+	uri, err := url.Parse(mqttURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if pubConnection == nil {
+		pubConnection = connect("DVIEnergiSmartControl-pub", uri)
+		log.Debug("Connecting to MQTT (pub)")
+	}
+
+	hwHVAC, _ := json.Marshal(hotWaterHVAC)
+	log.Debug(string(hwHVAC))
+	pubConnection.Publish("homeassistant/climate/DVIEnergiSmartControl/HotWaterHVAC/config", 1, true, hwHVAC)
+
+	chHVAC, _ := json.Marshal(centralHeatingHVAC)
+	log.Debug(string(chHVAC))
+	pubConnection.Publish("homeassistant/climate/DVIEnergiSmartControl/CentralHeatingHVAC/config", 1, true, chHVAC)
 }
