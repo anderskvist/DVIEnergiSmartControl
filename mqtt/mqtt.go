@@ -73,7 +73,7 @@ var (
 		ModeCommandTopic:        "convert/CH",
 	}
 
-	MQTTClientID = "DVIEnergiSmartControl-pub" + string(os.Getpid())
+	MQTTClientID = "DVIEnergiSmartControl" + string(os.Getpid())
 )
 
 func connect(clientId string, uri *url.URL) mqtt.Client {
@@ -108,7 +108,7 @@ func MonitorMQTT(cfg *ini.File) {
 	}
 
 	if subConnection == nil {
-		subConnection = connect("DVIEnergiSmartControl-sub", uri)
+		subConnection = connect(MQTTClientID+"sub", uri)
 		log.Debug("Connecting to MQTT (sub)")
 	}
 
@@ -154,7 +154,7 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	}
 
 	if pubConnection == nil {
-		pubConnection = connect("DVIEnergiSmartControl-pub", uri)
+		pubConnection = connect(MQTTClientID+"pub", uri)
 		log.Debug("Connecting to MQTT (pub)")
 	}
 	pubConnection.Publish("heatpump/Output/Sensor/BrineForward", 0, false, fmt.Sprintf("%f", dviData.Output.Sensor.BrineForward))
@@ -201,7 +201,7 @@ func HomeAssistantAutoDiscovery(cfg *ini.File) {
 	}
 
 	if pubConnection == nil {
-		pubConnection = connect("DVIEnergiSmartControl-pub", uri)
+		pubConnection = connect(MQTTClientID+"pub", uri)
 		log.Debug("Connecting to MQTT (pub)")
 	}
 
