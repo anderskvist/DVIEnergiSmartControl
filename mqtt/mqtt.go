@@ -128,5 +128,6 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 
 	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatState))
 	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatCurve))
+	pubConnection.Publish("heatpump/Output/Set/CHCurveTemp", 0, false, fmt.Sprintf("%f", dviData.Output.UserSettings.CentralheatCurveTemp))
 	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatTemp))
 }
