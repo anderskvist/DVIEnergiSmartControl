@@ -17,6 +17,7 @@ import (
 
 // HAHVAC is a struct to help auto discovery in Home Assistant
 type HAHVAC struct {
+	Platform                string   `json:"platform"`
 	Name                    string   `json:"name"`
 	Qos                     int      `json:"qos,omitempty"`
 	PayloadOn               int      `json:"payload_on,omitempty"`
@@ -40,7 +41,8 @@ var subConnection mqtt.Client
 
 var (
 	hotWaterHVAC = HAHVAC{
-		Name:                    "DVI heat pump - hot water",
+		Platform:                "mqtt",
+		Name:                    "DVI heat pump - hot water 2",
 		Qos:                     2,
 		TemperatureStateTopic:   "heatpump/Output/Set/VVTemp",
 		TemperatureCommandTopic: "heatpump/Input/Set/VVTemp",
@@ -55,10 +57,11 @@ var (
 		Modes:                   []string{"Clock", "Constant On", "Constant Off"},
 		ModeStateTopic:          "heatpump/Output/Set/VVClock",
 		ModeStateTemplate:       "{% set modes = { '0':'Clock', '1':'Constant On',  '2':'Constant Off'} %}{{ modes[value] if value in modes.keys() else 'off' }}",
-		ModeCommandTopic:        "convert/VVClock",
+		ModeCommandTopic:        "heatpump/Input/Set/VVClock",
 	}
 	centralHeatingHVAC = HAHVAC{
-		Name:                    "DVI heat pump - heating curve",
+		Platform:                "mqtt",
+		Name:                    "DVI heat pump - heating curve 2",
 		Qos:                     2,
 		TemperatureStateTopic:   "heatpump/Output/Set/CHCurve",
 		TemperatureCommandTopic: "heatpump/Input/Set/CHCurve",
@@ -132,6 +135,7 @@ func MonitorMQTT(cfg *ini.File) {
 			temp, _ := strconv.Atoi(string(payload))
 			set["VV"] = temp
 		case "heatpump/Input/Set/VVClock":
+			//set["VVClock"] = HotWaterClockConvertS2I(string(payload))
 			temp, _ := strconv.Atoi(string(payload))
 			set["VVClock"] = temp
 		case "heatpump/Input/Set/VVTemp":
@@ -184,12 +188,38 @@ func SendToMQTT(cfg *ini.File, dviData dvi.Response) {
 	pubConnection.Publish("heatpump/Output/Relay/Relay13", 0, false, fmt.Sprintf("%d", dviData.Output.Relay.Relay13))
 
 	pubConnection.Publish("heatpump/Output/Set/VV", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterState))
+	//pubConnection.Publish("heatpump/Output/Set/VVClock2", 0, false, fmt.Sprintf("%s", HotWaterClockConvertI2S(dviData.Output.UserSettings.HotwaterClock)))
 	pubConnection.Publish("heatpump/Output/Set/VVClock", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterClock))
+
 	pubConnection.Publish("heatpump/Output/Set/VVTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.HotwaterTemp))
 
 	pubConnection.Publish("heatpump/Output/Set/CH", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatState))
 	pubConnection.Publish("heatpump/Output/Set/CHCurve", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatCurve))
 	pubConnection.Publish("heatpump/Output/Set/CHTemp", 0, false, fmt.Sprintf("%d", dviData.Output.UserSettings.CentralheatTemp))
+}
+
+func HotWaterClockConvertI2S(i int) string {
+	switch i {
+	case 0:
+		return "Clock"
+	case 1:
+		return "Constant On"
+	case 2:
+		return "Constant Off"
+	}
+	return "Constant On"
+}
+
+func HotWaterClockConvertS2I(s string) int {
+	switch s {
+	case "Clock":
+		return 0
+	case "Constant On":
+		return 1
+	case "Constant Off":
+		return 2
+	}
+	return 2
 }
 
 // HomeAssistantAutoDiscovery will send DVI data to MQTT
