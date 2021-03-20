@@ -45,7 +45,11 @@ func main() {
 	for ; true; <-ticker.C {
 		log.Notice("Tick")
 		log.Info("Getting data from DVI")
-		dviData := dvi.GetDviData(cfg)
+		dviData, err := dvi.GetDviData(cfg)
+		if err != nil {
+			log.Error("Error getting data from DVI")
+			continue
+		}
 		log.Info("Done getting data from DVI")
 
 		if influxconfig {

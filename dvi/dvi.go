@@ -3,6 +3,7 @@ package dvi
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -140,7 +141,7 @@ func jsonPrettyPrint(in string) string {
 }
 
 // GetDviData is to get data from DVI
-func GetDviData(cfg *ini.File) Response {
+func GetDviData(cfg *ini.File) (Response, error) {
 	data := LoginGet{
 		Usermail:     cfg.Section("login").Key("usermail").String(),
 		Userpassword: cfg.Section("login").Key("userpassword").String(),
@@ -162,6 +163,7 @@ func GetDviData(cfg *ini.File) Response {
 	response, err := http.Post("https://ws.dvienergi.com/API/", "application/json", bytes.NewBuffer(jsondata))
 	if err != nil {
 		log.Errorf("The HTTP request failed with error %s\n", err)
+		return dviData, errors.New("Error in response from DVI")
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
 
@@ -172,7 +174,7 @@ func GetDviData(cfg *ini.File) Response {
 			panic(err)
 		}
 	}
-	return dviData
+	return dviData, nil
 }
 
 // SetDVIData is to set data to DVI
