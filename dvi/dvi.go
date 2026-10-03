@@ -140,6 +140,23 @@ func jsonPrettyPrint(in string) string {
 	return out.String()
 }
 
+func cleanJSON(b []byte) []byte {
+	// Find the first occurrence of '{' or '['
+	idxObj := bytes.IndexByte(b, '{')
+	idxArr := bytes.IndexByte(b, '[')
+
+	if idxObj == -1 && idxArr == -1 {
+		return b // Return as-is if no JSON structure is found
+	}
+
+	start := idxObj
+	if start == -1 || (idxArr != -1 && idxArr < start) {
+		start = idxArr
+	}
+
+	return b[start:]
+}
+
 // GetDviData is to get data from DVI
 func GetDviData(cfg *ini.File) (Response, error) {
 	data := LoginGet{
@@ -166,10 +183,11 @@ func GetDviData(cfg *ini.File) (Response, error) {
 		return dviData, errors.New("Error in response from DVI")
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
+		cleanData := cleanJSON(data)
 
-		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(data)))))
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(cleanData)))))
 
-		err := json.Unmarshal(data, &dviData)
+		err := json.Unmarshal(cleanData, &dviData)
 		if err != nil {
 			panic(err)
 		}
@@ -198,10 +216,11 @@ func SetDVIData(cfg *ini.File, set map[string]int) {
 		log.Debugf("The HTTP request failed with error %s\n", err)
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
+		cleanData := cleanJSON(data)
 
-		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(data)))))
+		log.Debugf("%s\n", jsonPrettyPrint(string(maskPassword(string(cleanData)))))
 
-		err := json.Unmarshal(data, &dviData)
+		err := json.Unmarshal(cleanData, &dviData)
 		if err != nil {
 			panic(err)
 		}
